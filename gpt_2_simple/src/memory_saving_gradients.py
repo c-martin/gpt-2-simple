@@ -2,7 +2,7 @@ from toposort import toposort
 import contextlib
 import numpy as np
 import tensorflow as tf
-import tensorflow.contrib.graph_editor as ge
+import graph_def_editor as ge
 import time
 import sys
 sys.setrecursionlimit(10000)
@@ -97,7 +97,7 @@ def gradients(ys, xs, grad_ys=None, checkpoints='collection', **kwargs):
             # remove very small tensors and some weird ops
             def fixdims(t): # tf.Dimension values are not compatible with int, convert manually
                 try:
-                    return [int(e if e.value is not None else 64) for e in t]
+                    return [int(e if e is not None else 64) for e in t]
                 except:
                     return [0]  # unknown shape
             ts_all = [t for t in ts_all if np.prod(fixdims(t.shape)) > MIN_CHECKPOINT_NODE_SIZE]

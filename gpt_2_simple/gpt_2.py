@@ -156,7 +156,7 @@ def finetune(sess,
     # assert model_name not in ['774M', '1558M'] or multi_gpu, "Currently, a modern single GPU cannot finetune the 774M GPT-2 model or larger."
 
     SAMPLE_DIR = 'samples'
-
+    log = []
     checkpoint_path = os.path.join(checkpoint_dir, run_name)
 
     def maketree(path):
@@ -283,6 +283,8 @@ def finetune(sess,
             global_step=counter-1)
         with open(counter_path, 'w') as fp:
             fp.write(str(counter-1) + '\n')
+        with open(os.path.join(checkpoint_path, 'training_log.txt'), 'w') as fl:
+            fl.writelines(['training history\n']+[str(x)+'\n' for x in log])
 
     def generate_samples():
         context_tokens = data_sampler.sample(1)
@@ -354,6 +356,7 @@ def finetune(sess,
                         time=time.time() - start_time,
                         loss=v_loss,
                         avg=avg_loss[0] / avg_loss[1]))
+                log.append([v_loss, avg_loss[0]/avg_loss[1]])
 
             counter += 1
     except KeyboardInterrupt:
